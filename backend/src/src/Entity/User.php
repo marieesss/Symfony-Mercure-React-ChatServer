@@ -4,12 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-
-
-
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -19,27 +15,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @Assert\NotBlank(message="Le nom d'utilisateur ne peut pas être vide.")
-     * @Assert\Length(min=3, minMessage="Le nom d'utilisateur doit comporter au moins 3 caractères.")
-     */
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $username = null;
+    
 
-    /**
-     * @Assert\NotBlank(message="L'adresse e-mail ne peut pas être vide.")
-     * @Assert\Email(message="L'adresse e-mail n'est pas valide.")
-     */
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $mail = null;
 
+    #[ORM\ManyToMany(targetEntity: Channel::class, inversedBy: 'users')]
+    private $channel;
+
+
+
+    #[ORM\Column]
+    private array $roles = [];
 
     /**
-     * @Assert\NotBlank(message="Le mot de passe ne peut pas être vide.")
-     * @Assert\Length(min=6, minMessage="Le mot de passe doit comporter au moins {{ limit }} caractères.")
+     * @var string The hashed password
      */
-    #[Assert\GreaterThan(6)]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column]
     private ?string $password = null;
 
     public function getId(): ?int
@@ -61,17 +55,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getMail(): ?string
     {
-        return $this->mail;
+        return $this->$mail;
     }
 
     public function setMail(string $mail): static
     {
         $this->mail = $mail;
+    
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
 
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -86,30 +112,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function getSalt()
-    {
-        // not needed when using the "bcrypt" algorithm in security.yaml
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
 
-    public function getRoles(): array
+
+    public function getChannel(): string
     {
-        // Retournez un tableau de rôles pour l'utilisateur ici, par exemple, ['ROLE_USER']
-        return ['ROLE_USER'];
+        return $this->channel;
     }
 
-    public function getUserIdentifier(): string
+    public function setChannel(string $channel): static
     {
-        // Retournez l'identifiant de l'utilisateur ici, généralement, l'adresse e-mail
-        return $this->getMail();
+        $this->channel = $channel;
+
+        return $this;
     }
+
 
 }
