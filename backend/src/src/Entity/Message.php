@@ -18,16 +18,15 @@ class Message
     private ?string $text = null;
 
 
-    #[ORM\ManyToOne(targetEntity: Channel::class, inversedBy: 'channel')]
-    private ?Channel $channel;
 
-
-    #[ORM\ManytoOne(targetEntity: User::class,  inversedBy: 'user')]
-    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userId = null;
+
+    #[ORM\ManyToOne(inversedBy: 'message')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Channel $channel = null;
 
 
 
@@ -48,14 +47,14 @@ class Message
         return $this;
     }
 
-    public function getUser(): ?int
+    public function getUserId(): ?User
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser(int $user): static
+    public function setUserId(?User $userId): static
     {
-        $this->user = $user;
+        $this->userId = $userId;
 
         return $this;
     }
@@ -65,21 +64,9 @@ class Message
         return $this->channel;
     }
 
-    public function setChannel(Channel $channel): static
+    public function setChannel(?Channel $channel): static
     {
         $this->channel = $channel;
-
-        return $this;
-    }
-
-    public function getUserId(): ?User
-    {
-        return $this->userId;
-    }
-
-    public function setUserId(?User $userId): static
-    {
-        $this->userId = $userId;
 
         return $this;
     }

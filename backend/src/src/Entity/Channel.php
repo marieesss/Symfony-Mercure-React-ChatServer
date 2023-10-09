@@ -19,11 +19,17 @@ class Channel
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'channel')]
-    private $users;
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'channels')]
+    private Collection $User;
 
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'user')]
-    private $messages;
+    #[ORM\OneToMany(mappedBy: 'channel', targetEntity: Message::class, orphanRemoval: true)]
+    private Collection $message;
+
+    public function __construct()
+    {
+        $this->User = new ArrayCollection();
+        $this->message = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -42,48 +48,42 @@ class Channel
         return $this;
     }
 
-    public function __construct()
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUser(): Collection
     {
-        $this->users = new ArrayCollection();
-        $this->messages = new ArrayCollection();
+        return $this->User;
     }
 
-    public function getUsers(): Collection
+    public function addUser(User $user): static
     {
-        return $this->users;
-    }
-
-    public function addUsers(User $user): static
-    {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->setChannel($this);
+        if (!$this->User->contains($user)) {
+            $this->User->add($user);
         }
 
         return $this;
     }
 
-    public function removeUsers(User $user): static
+    public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
-            if ($user->getChannel() === $this) {
-                $user->setChannel(null);
-            }
-        }
+        $this->User->removeElement($user);
 
         return $this;
     }
 
-
-    public function getMessages(): Collection
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessage(): Collection
     {
-        return $this->messages;
+        return $this->message;
     }
 
     public function addMessage(Message $message): static
     {
-        if (!$this->messages->contains($message)) {
-            $this->messages[] = $message;
+        if (!$this->message->contains($message)) {
+            $this->message->add($message);
             $message->setChannel($this);
         }
 
@@ -92,7 +92,8 @@ class Channel
 
     public function removeMessage(Message $message): static
     {
-        if ($this->messages->removeElement($message)) {
+        if ($this->message->removeElement($message)) {
+            // set the owning side to null (unless already changed)
             if ($message->getChannel() === $this) {
                 $message->setChannel(null);
             }
@@ -100,5 +101,6 @@ class Channel
 
         return $this;
     }
+
 
 }

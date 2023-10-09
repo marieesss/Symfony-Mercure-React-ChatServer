@@ -24,10 +24,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $mail = null;
 
-    #[ORM\ManyToMany(targetEntity: Channel::class, inversedBy: 'user')]
-    private $channel;
-
-
 
     #[ORM\Column]
     private array $roles = [];
@@ -41,9 +37,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'userId', targetEntity: Message::class)]
     private Collection $messages;
 
+    #[ORM\ManyToMany(targetEntity: Channel::class, mappedBy: 'User')]
+    private Collection $channels;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
+        $this->channels = new ArrayCollection();
     }
 
 
@@ -130,18 +130,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    public function getChannel(): Channel
-    {
-        return $this->channel;
-    }
-
-    public function setChannel($channel): static
-    {
-        $this->channel = $channel;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Message>
      */
@@ -167,6 +155,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($message->getUserId() === $this) {
                 $message->setUserId(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Channel>
+     */
+    public function getChannels(): Collection
+    {
+        return $this->channels;
+    }
+
+    public function addChannel(Channel $channel): static
+    {
+        if (!$this->channels->contains($channel)) {
+            $this->channels->add($channel);
+            $channel->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChannel(Channel $channel): static
+    {
+        if ($this->channels->removeElement($channel)) {
+            $channel->removeUser($this);
         }
 
         return $this;
