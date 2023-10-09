@@ -30,7 +30,7 @@ class ChannelController extends AbstractController
     
             // Ajoutez les utilisateurs au canal
             foreach ($users as $user) {
-                $channel->addUsers($user);
+                $channel->addUser($user);
             }
     
             // Enregistrez le canal en base de données
@@ -43,5 +43,39 @@ class ChannelController extends AbstractController
         }
     
     }
+
     
+    #[Route('/mychannels/{id}', methods: ['GET'])]
+    public function GetMyChannels(int $id, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    {
+        
+       // Récupérez l'utilisateur en fonction de l'ID
+       $user = $userRepository->find($id);
+
+       if (!$user) {
+           // Gérez le cas où l'utilisateur n'a pas été trouvé
+           return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+       }
+   
+       // Récupérez les canaux associés à l'utilisateur
+       $channels = $user->getChannels();
+   
+       // Créez un tableau pour stocker les informations sur les canaux
+       $channelData = [];
+   
+       // Parcourez les canaux et collectez les informations requises
+       foreach ($channels as $channel) {
+           $channelData[] = [
+               'id' => $channel->getId(),
+               'name' => $channel->getName(),
+               // Ajoutez d'autres informations sur le canal si nécessaire
+           ];
+       }
+   
+       // Retournez les informations sur les canaux sous forme de réponse JSON
+       return $this->json(['channels' => $channelData]);
+    
+    }
+
 }
+    
