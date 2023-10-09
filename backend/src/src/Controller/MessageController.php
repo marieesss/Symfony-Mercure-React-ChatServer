@@ -45,7 +45,6 @@ class MessageController extends AbstractController
 
 
         
-    #[Route('/messagesChannels/{id}', methods: ['GET'])]
     public function getMessageFromChannel
     (int $id, Request $request, MessageRepository $MessageRepository, ChannelRepository $channelRepository,
     UserRepository $UserRepository): Response

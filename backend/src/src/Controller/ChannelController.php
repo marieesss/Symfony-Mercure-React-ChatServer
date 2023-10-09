@@ -38,7 +38,7 @@ class ChannelController extends AbstractController
             $entityManager->flush();
     
             return $this->json([
-                'channel' => $users
+                'channel' => "channel créé"
             ]);
         }
     
