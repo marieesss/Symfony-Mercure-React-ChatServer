@@ -22,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $mail = null;
 
-    #[ORM\ManyToMany(targetEntity: Channel::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Channel::class, inversedBy: 'user')]
     private $channel;
 
 
@@ -35,6 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
 
     public function getId(): ?int
     {
@@ -55,7 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getMail(): ?string
     {
-        return $this->$mail;
+        return $this->mail;
     }
 
     public function setMail(string $mail): static
@@ -119,12 +120,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    public function getChannel(): string
+    public function getChannel(): Channel
     {
         return $this->channel;
     }
 
-    public function setChannel(string $channel): static
+    public function setChannel($channel): static
     {
         $this->channel = $channel;
 
