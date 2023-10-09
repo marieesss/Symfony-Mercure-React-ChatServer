@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
@@ -24,11 +25,11 @@ class Message
     #[ORM\ManytoOne(targetEntity: User::class,  inversedBy: 'user')]
     private ?User $user = null;
 
-    #[ORM\PrePersist]
-    public function setCreatedAtValue()
-    {
-    $this->createdAt = new \DateTimeImmutable();
-    }
+    #[ORM\ManyToOne(inversedBy: 'messages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $userId = null;
+
+
 
     public function getId(): ?int
     {
@@ -59,14 +60,26 @@ class Message
         return $this;
     }
 
-    public function getChannel(): ?int
+    public function getChannel(): ?Channel
     {
         return $this->channel;
     }
 
-    public function setChannel(int $channel): static
+    public function setChannel(Channel $channel): static
     {
         $this->channel = $channel;
+
+        return $this;
+    }
+
+    public function getUserId(): ?User
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(?User $userId): static
+    {
+        $this->userId = $userId;
 
         return $this;
     }
