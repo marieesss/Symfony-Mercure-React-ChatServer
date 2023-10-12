@@ -25,6 +25,9 @@ class Channel
     #[ORM\OneToMany(mappedBy: 'channel', targetEntity: Message::class, orphanRemoval: true)]
     private Collection $message;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
     public function __construct()
     {
         $this->User = new ArrayCollection();
@@ -98,6 +101,18 @@ class Channel
                 $message->setChannel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

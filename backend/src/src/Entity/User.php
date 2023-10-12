@@ -3,13 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners(['App\EntityListener\UserListener'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -18,12 +19,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $username = null;
+    private ?string $email = null;
+
     
-
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $mail = null;
+    private ?string $username = null;
 
+    #[ORM\OneToMany(mappedBy: 'userId', targetEntity: Message::class, cascade: ["persist"])]
+    private Collection $messages;
+
+    #[ORM\ManyToMany(targetEntity: Channel::class, mappedBy: 'User',  cascade: ["persist"])]
+    private Collection $channels;
 
     #[ORM\Column]
     private array $roles = [];
@@ -34,14 +40,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'userId', targetEntity: Message::class)]
-    private Collection $messages;
+    private ?string $plainPassword = null;
 
-    #[ORM\ManyToMany(targetEntity: Channel::class, mappedBy: 'User')]
-    private Collection $channels;
+    
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
+    
     public function __construct()
     {
+        $this-> createdAt = new \DateTimeImmutable();
         $this->messages = new ArrayCollection();
         $this->channels = new ArrayCollection();
     }
@@ -52,6 +60,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    
     public function getUsername(): ?string
     {
         return $this->username;
@@ -64,18 +85,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMail(): ?string
-    {
-        return $this->mail;
-    }
-
-    public function setMail(string $mail): static
-    {
-        $this->mail = $mail;
-    
-        return $this;
-    }
-
     /**
      * A visual identifier that represents this user.
      *
@@ -83,7 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return (string) $this->email;
     }
 
     /**
@@ -120,6 +129,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
     /**
      * @see UserInterface
      */
@@ -128,7 +149,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
-
 
     /**
      * @return Collection<int, Message>
@@ -187,5 +207,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 }

@@ -28,6 +28,9 @@ class Message
     #[ORM\JoinColumn(nullable: false)]
     private ?Channel $channel = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
 
 
     public function getId(): ?int
@@ -67,6 +70,18 @@ class Message
     public function setChannel(?Channel $channel): static
     {
         $this->channel = $channel;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
