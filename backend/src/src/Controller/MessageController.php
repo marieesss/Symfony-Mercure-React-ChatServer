@@ -29,7 +29,9 @@ class MessageController extends AbstractController
         $user = $UserRepository->find($data['userId']);
     
         if (!$channel) {
+            return new JsonResponse(['error' => 'Canal non trouvé'], 404);
         }
+
     
         $message->setChannel($channel); 
         $message->setUserId($user);
@@ -44,7 +46,7 @@ class MessageController extends AbstractController
     }
 
 
-        
+    #[Route('/message?channelId={id}', methods: ['POST'])]    
     public function getMessageFromChannel
     (int $id, Request $request, MessageRepository $MessageRepository, ChannelRepository $channelRepository,
     UserRepository $UserRepository): Response
