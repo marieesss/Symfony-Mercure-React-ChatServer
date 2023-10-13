@@ -10,6 +10,10 @@ docker exec symfony_docker composer create-project symfony/skeleton html
 sudo chown -R $USER ./
 ````
 
+A remplir pour les clés des token voir openclassroom :
+````shell
+````
+
 Pensez ensuite à aller exécuter toutes vos commandes depuis l'intérieur du container.
 
 Par exemple :

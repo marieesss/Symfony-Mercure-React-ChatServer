@@ -10,7 +10,7 @@ use App\Repository\UserRepository;
 
 class UserController extends AbstractController
 {
-    #[Route('/users', methods: ['GET'])]
+    #[Route('/api/users', methods: ['GET'])]
     public function index(userRepository $userRepository): Response
     {
         $users = $userRepository->findAll();

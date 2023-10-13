@@ -12,10 +12,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Repository\UserRepository; 
+use App\Repository\UserRepository;
 
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+
 class SecurityController extends AbstractController
 {
     #[Route(path: '/', name: 'app_login')]
@@ -31,31 +32,6 @@ class SecurityController extends AbstractController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
-    }
-
-    #[Route('/register', methods: ['POST'])]
-    public function add(Request $request, EntityManagerInterface $entityManager,
-     ValidatorInterface $validator, UserPasswordHasherInterface $passwordHasher)
-    {
-        $data = json_decode($request->getContent(), true);
-        $user = new User();
-        
-        $user->setUsername($data['username']);
-        $user->setMail($data['mail']);
-
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $data['password']
-        );
-        $user->setPassword($hashedPassword);
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        
-        return $this->json([
-            'users' => 'créé'
-        ]);
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
