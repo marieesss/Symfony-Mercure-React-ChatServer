@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\EntityListeners(['App\EntityListener\UserListener'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -21,7 +20,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    
+
     #[ORM\Column(length: 180, unique: true)]
     private ?string $username = null;
 
@@ -40,16 +39,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    private ?string $plainPassword = null;
+    private ?string $plainPassword = '';
 
-    
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    
+
     public function __construct()
     {
-        $this-> createdAt = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
         $this->messages = new ArrayCollection();
         $this->channels = new ArrayCollection();
     }
@@ -72,7 +71,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    
+
     public function getUsername(): ?string
     {
         return $this->username;

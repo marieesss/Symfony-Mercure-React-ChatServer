@@ -19,7 +19,7 @@ class UserController extends AbstractController
             $userData[] = [
                 'id' => $user->getId(),
                 'name' => $user->getUsername(),
-                'email' => $user->getMail(),
+                'email' => $user->getEMail(),
                 // Ajoutez d'autres informations sur le canal si nécessaire
             ];
         }
