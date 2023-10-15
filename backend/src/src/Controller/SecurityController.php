@@ -10,6 +10,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+
 
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +36,7 @@ class SecurityController extends AbstractController
 
         $user->setUsername($data['username']);
         $user->setEMail($data['mail']);
+        $user->setRoles($data['ROLE_USER']);
 
         $hashedPassword = $passwordHasher->hashPassword(
             $user,
@@ -51,8 +54,8 @@ class SecurityController extends AbstractController
     }
 
 
-    #[Route('/api/login', methods: ['POST'])]
-    public function login(Request $request, UserRepository $userRepository): JsonResponse
+    #[Route('/api/login_check', methods: ['POST'])]
+    public function login(Request $request, UserRepository $userRepository, JWTTokenManagerInterface $jwtManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -64,11 +67,10 @@ class SecurityController extends AbstractController
         }
 
 
-        // Générez un jeton JWT
         // $token = $jwtManager->create($user);
 
         return $this->json([
-            'token' => 'utilisateur connecté',
+            'user' => 'user identifié',
         ]);
     }
 
